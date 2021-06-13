@@ -64,9 +64,11 @@ class Policy():
         else:
             return (self.theta - hp.noise * delta).dot(input)
         
-        
+    def sample_deltas(self):
+        # function to return noise matrices
+        return [np.random.randn(*self.theta.shape) for _ in range(hp.num_directions)]
 
-
+    
 
 
         
