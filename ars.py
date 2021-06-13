@@ -27,4 +27,15 @@ class Hp():
         self.seed = 1
         self.env_name = ''
 
-# normalization        
+# normalization
+class Normalizer():
+    # constructor
+    def __init__(self, num_inputs):
+        self.n = np.zeros(num_inputs) # counts the number of states
+        self.mean = np.zeros(num_inputs)
+        self.mean_diff = np.zeros(num_inputs) # for variance calc
+        self.var = np.zeros(num_inputs) # variance
+
+
+
+        
