@@ -27,7 +27,7 @@ class Hp():
         self.seed = 1
         self.env_name = ''
 
-# normalization
+# normalization (paper calls it normalization but actually it is standardization)
 class Normalizer():
     # constructor
     def __init__(self, num_inputs):
@@ -36,6 +36,18 @@ class Normalizer():
         self.mean_diff = np.zeros(num_inputs) # for variance calc
         self.var = np.zeros(num_inputs) # variance
 
-
-
+    def observe(self, x):
+        self.n += 1. # counter
+        self.last_mean = self.mean.copy()
+        self.mean += (x - self.mean) / self.n
+        self.mean_diff += (x - self.last_mean) * (x - self.mean)
+        self.var = (self.mean_diff / self.n).clip(min = 0.001)
+    
+    def normalize(self, inputs):
+        obs_mean = self.mean 
+        obs_std = np.sqrt(self.var)
+        return(inputs - obs_mean) / obs_std
+        
+        
+        
         
