@@ -69,13 +69,39 @@ class Policy():
         return [np.random.randn(*self.theta.shape) for _ in range(hp.num_directions)]
 
     def update(self, rollouts, sigma_r):
+        # weight update method
         step = np.zeros(self.theta.shape)
         # rollout is a list of positive/negative rewards and noise
         for r_pos, r_neg, d in rollouts:
             step += (r_pos - r_neg)*d
         # sigma_r is rewards std.
         self.theta += hp.learning_rate / (hp.best_directions * sigma_r) * step
+    
+    
+# explores the environment 
+def explore(env, normalizer, policy, direction = None, delta = None):
+    state = env.reset()
+    done = False
+    num_plays = 0.
+    sum_rewards = 0
+    # loop while for exploring the environment
+    while not done and num_plays < hp.episode_lenght:
+        # observes the initialized state
+        normalizer.observe(state)
+        # normalizes the inputs
+        state = normalizer.normalize(state)
+        # evaluates the inputs and provides outputs for actions
+        action = policy.evaluate(state, delta, direction)
+        # applies the action in the environment i.e., takes a step
+        state, reward, done, _ = env.step(action)
+        # balances the rewards
+        reward = max(min(reward, 1), -1)
+        sum_rewards += reward
+        num_plays += 1
+    # returns sum of rewards
+    return sum_rewards
         
+    
         
         
 
