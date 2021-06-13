@@ -47,7 +47,28 @@ class Normalizer():
         obs_mean = self.mean 
         obs_std = np.sqrt(self.var)
         return(inputs - obs_mean) / obs_std
+
+
+# AI class
+class Policy():
+    # constructor
+    def __init__(self, input_size, output_size):
+        # weights matrix
+        self.theta = np.zeros((output_size, input_size))
+    
+    def evaluate(self, input, delta = None, direction = None):
+        if direction is None:
+            return self.theta.dot(input)
+        elif direction == 'positive':
+            return (self.theta + hp.noise * delta).dot(input)
+        else:
+            return (self.theta - hp.noise * delta).dot(input)
         
+        
+
+
+
+
         
         
         
