@@ -68,7 +68,16 @@ class Policy():
         # function to return noise matrices
         return [np.random.randn(*self.theta.shape) for _ in range(hp.num_directions)]
 
-    
+    def update(self, rollouts, sigma_r):
+        step = np.zeros(self.theta.shape)
+        # rollout is a list of positive/negative rewards and noise
+        for r_pos, r_neg, d in rollouts:
+            step += (r_pos - r_neg)*d
+        # sigma_r is rewards std.
+        self.theta += hp.learning_rate / (hp.best_directions * sigma_r) * step
+        
+        
+        
 
 
         
