@@ -100,9 +100,40 @@ def explore(env, normalizer, policy, direction = None, delta = None):
         num_plays += 1
     # returns sum of rewards
     return sum_rewards
+
+# AI training
+def train(env, policy, normalizer, hp):
+    for step in range(hp.num_steps):
+        # starts o noise (deltas) and positive/negative rewards
+        deltas = policy.sample_deltas()
+        positive_rewards = [0] * hp.num_directions
+        negative_rewards = [0] * hp.num_directions
         
-    
+        # gets positive rewards
+        for k in range(hp.num_directions):
+            positive_rewards[k] = explore(env, normalizer, direction = 'positive', deltas[k])
         
+        # gets negative rewards
+        for k in range(hp.num_directions):
+            negative_rewards[k] = explore(env, normalizer, direction = 'negative', deltas[k])
+        
+        # gets all rewards and evaluate
+        all_rewards = np.array(positive_rewards + negative_rewards) # numpy array to obtain .std method
+        sigma_r = all_rewards.std()
+        
+        # sorting rollouts and selecting best directions
+        scores = {k: max(r_pos, r_neg) for k, (r_pos, r_neg) in enumerate(zip(positive_rewards))} # dict to obtain .sort method
+        order = sorted(scores.keys(), key = lambda x: scores[x], reverse = True)[:hp.num_best_directions]
+        rollouts = [(positive_rewards[k], negative_rewards[k], deltas[k]) for k in order]
+        
+        # updating policy/weights
+        policy.update(rollouts, sigma_r)
+        
+        # printing updated final reward
+        reward_evaluation = explore(env, normalizer, policy)
+        print('Step: ', step, ' Reward: ', reward_evaluation)
+        
+
         
 
 
